@@ -1,0 +1,9 @@
+name: bactopia-fastq-scan
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - fastq-scan
+  - jq
+
