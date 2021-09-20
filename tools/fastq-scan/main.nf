@@ -237,32 +237,18 @@ def gather_sample_set(bactopia_dir, exclude_list, include_list, sleep_time) {
     return sample_list
 }
 
-def fastq_scan(sample, dir) {
-    se = "${dir}/${sample}/quality-control/${sample}.fastq.gz"
-    pe1 = "${dir}/${sample}/quality-control/${sample}_R1.fastq.gz"
-    pe2 = "${dir}/${sample}/quality-control/${sample}_R2.fastq.gz"
-    defingle_end = false
-    files = null
-    json_stats = null
+process fastq_scan {
 
     input:
-    file se
-    file pe1 
-    file pe2 
+    tuple val(sample), val(single_end), file(fq) from Channel.fromList(samples)
 
     output:
-    file "${sample}.R1.json"
-    file "${sample}.R2.json"
-    file "${sample}.SE.json"
+    file "*.json"
 
     // NOTE: this was done with fastq-scan v0.4.4 and jq-1.6
     shell:
     """
-    for fastq in {pe1} {pe2} {se}; do
-        if [ -e \$fastq ]; then
-            zcat \$fastq | fastq-scan | jq . > \$fastq.json
-        fi
-    done
+    zcat $fq | fastq-scan | jq . > ${fq}.json
     """
 }
 
